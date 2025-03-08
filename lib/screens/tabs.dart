@@ -8,11 +8,11 @@ import 'package:meals/widgets/main_drawer.dart';
 import 'package:meals/providers/favorites_provider.dart';
 import 'package:meals/providers/filters_provider.dart';
 
-const kInitialFilter = {
+const kInitialFilters = {
   Filter.glutenFree: false,
   Filter.lactoseFree: false,
-  Filter.vegan: false,
   Filter.vegetarian: false,
+  Filter.vegan: false
 };
 
 class TabsScreen extends ConsumerStatefulWidget {
@@ -25,47 +25,62 @@ class TabsScreen extends ConsumerStatefulWidget {
 }
 
 class _TabsScreenState extends ConsumerState<TabsScreen> {
-  int _selectPageIndex = 0;
+  int _selectedPageIndex = 0;
 
   void _selectPage(int index) {
     setState(() {
-      _selectPageIndex = index;
+      _selectedPageIndex = index;
     });
   }
 
   void _setScreen(String identifier) async {
     Navigator.of(context).pop();
-
     if (identifier == 'filters') {
-      await Navigator.of(
-        context,
-      ).push<Map<Filter, bool>>(MaterialPageRoute(builder: (ctx) => const FiltersScreen()));
+      await Navigator.of(context).push<Map<Filter, bool>>(
+        MaterialPageRoute(
+          builder: (ctx) => const FiltersScreen(),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final availbleMeals = ref.watch(filteredMealsProvider);
+    final availableMeals = ref.watch(filteredMealsProvider);
 
-    Widget activePage = CategoriesScreen(availableMeals: availbleMeals);
+    Widget activePage = CategoriesScreen(
+      availableMeals: availableMeals,
+    );
     var activePageTitle = 'Categories';
 
-    if (_selectPageIndex == 1) {
+    if (_selectedPageIndex == 1) {
       final favoriteMeals = ref.watch(favoriteMealsProvider);
-      activePage = MealsScreen(meals: favoriteMeals);
+      activePage = MealsScreen(
+        meals: favoriteMeals,
+      );
       activePageTitle = 'Your Favorites';
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(activePageTitle)),
-      drawer: MainDrawer(onSelectScreen: _setScreen),
+      appBar: AppBar(
+        title: Text(activePageTitle),
+      ),
+      drawer: MainDrawer(
+        onSelectScreen: _setScreen,
+      ),
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
-        currentIndex: _selectPageIndex,
+        currentIndex: _selectedPageIndex,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.set_meal), label: 'Categories'),
-          BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Favorites'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.set_meal),
+            label: 'Categories',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star),
+            label: 'Favorites',
+          ),
         ],
       ),
     );
